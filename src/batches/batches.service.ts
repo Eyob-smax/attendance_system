@@ -13,7 +13,7 @@ export class BatchesService {
   constructor(private readonly databaseService: DatabaseService) {}
 
   async create(createBatchDto: CreateBatchDto) {
-    if (!createBatchDto.batch_name) {
+    if (!createBatchDto.batch_name || !createBatchDto.start_date) {
       throw new BadRequestException('Batch name is required!');
     }
 

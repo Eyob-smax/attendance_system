@@ -24,7 +24,7 @@ model Batch {
   batch_name   String    @unique @db.VarChar(50)
   start_date   DateTime  @db.Date
   end_date     DateTime? @db.Date
-  is_completed Boolean   @default(false)
+  is_completed Boolean?   @default(false)
   students     Student[]
   course_dates CourseDate[]
   certificates Certificate[]
