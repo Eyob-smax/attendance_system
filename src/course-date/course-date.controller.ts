@@ -19,7 +19,12 @@ export class CourseDateController {
   constructor(private readonly courseDateService: CourseDateService) {}
 
   @Post()
-  @UsePipes(new ValidationPipe({ transform: true }))
+  @UsePipes(
+    new ValidationPipe({
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: true,
+    }),
+  )
   create(@Body() createCourseDateDto: CreateCourseDateDto) {
     return this.courseDateService.create(createCourseDateDto);
   }
@@ -35,7 +40,12 @@ export class CourseDateController {
   }
 
   @Patch(':id')
-  @UsePipes(new ValidationPipe({ transform: true }))
+  @UsePipes(
+    new ValidationPipe({
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: true,
+    }),
+  )
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateCourseDateDto: UpdateCourseDateDto,
