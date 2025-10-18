@@ -1,26 +1,94 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCourseDto } from './dto/create-course.dto';
-import { UpdateCourseDto } from './dto/update-course.dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { CreateCourseDto } from './dto/create-course.dto.js';
+import { UpdateCourseDto } from './dto/update-course.dto.js';
+import { DatabaseService } from '../database/database.service.js';
+import { mapPrismaErrorToHttp } from '../common/utils/handleDbError.js';
 
 @Injectable()
 export class CourseService {
-  create(createCourseDto: CreateCourseDto) {
-    return 'This action adds a new course';
+  constructor(private readonly databaseService: DatabaseService) {}
+
+  async create(createCourseDto: CreateCourseDto) {
+    if (!createCourseDto.course_name) {
+      throw new BadRequestException('Course name is required!');
+    }
+
+    try {
+      const course = await this.databaseService.course.create({
+        data: createCourseDto,
+      });
+      return {
+        course,
+        message: 'Course created successfully',
+      };
+    } catch (err) {
+      throw mapPrismaErrorToHttp(err);
+    }
   }
 
-  findAll() {
-    return `This action returns all course`;
+  async findAll() {
+    try {
+      const courses = await this.databaseService.course.findMany();
+      return {
+        courses,
+      };
+    } catch (err) {
+      throw mapPrismaErrorToHttp(err);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} course`;
+  async findOne(id: number) {
+    try {
+      const course = await this.databaseService.course.findUnique({
+        where: { course_id: id },
+      });
+      if (!course) {
+        throw new NotFoundException(`Course with ID ${id} not found`);
+      }
+      return {
+        course,
+      };
+    } catch (err) {
+      throw mapPrismaErrorToHttp(err);
+    }
   }
 
-  update(id: number, updateCourseDto: UpdateCourseDto) {
-    return `This action updates a #${id} course`;
+  async update(id: number, updateCourseDto: UpdateCourseDto) {
+    try {
+      const course = await this.databaseService.course.update({
+        where: { course_id: id },
+        data: updateCourseDto,
+      });
+      return {
+        course,
+        message: 'Course updated successfully',
+      };
+    } catch (err) {
+      if (err instanceof Error && (err as any).code === 'P2025') {
+        throw new NotFoundException(`Course with ID ${id} not found`);
+      }
+      throw mapPrismaErrorToHttp(err);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} course`;
+  async remove(id: number) {
+    try {
+      const course = await this.databaseService.course.delete({
+        where: { course_id: id },
+      });
+      return {
+        course,
+        message: 'Course deleted successfully',
+      };
+    } catch (err) {
+      if (err instanceof Error && (err as any).code === 'P2025') {
+        throw new NotFoundException(`Course with ID ${id} not found`);
+      }
+      throw mapPrismaErrorToHttp(err);
+    }
   }
 }

@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "resolvePackageJsonExports": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolvePackageJsonExports": false,
     "esModuleInterop": true,
     "isolatedModules": true,
     "declaration": true,
@@ -15,11 +15,8 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
-    "skipLibCheck": true,
-    "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "skipLibCheck": true,
+    "resolveJsonModule": true
   }
 }

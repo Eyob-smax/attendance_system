@@ -1,34 +1,49 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { CourseService } from './course.service';
-import { CreateCourseDto } from './dto/create-course.dto';
-import { UpdateCourseDto } from './dto/update-course.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+  UseInterceptors,
+} from '@nestjs/common';
+import { CourseService } from './course.service.js';
+import { CreateCourseDto } from './dto/create-course.dto.js';
+import { UpdateCourseDto } from './dto/update-course.dto.js';
+import { CourseInterceptor } from './interceptors/courses.interceptor.js';
 
 @Controller('course')
+@UseInterceptors(CourseInterceptor)
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
   @Post()
-  create(@Body() createCourseDto: CreateCourseDto) {
-    return this.courseService.create(createCourseDto);
+  async create(@Body() createCourseDto: CreateCourseDto) {
+    return await this.courseService.create(createCourseDto);
   }
 
   @Get()
-  findAll() {
-    return this.courseService.findAll();
+  async findAll() {
+    return await this.courseService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.courseService.findOne(+id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.courseService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
-    return this.courseService.update(+id, updateCourseDto);
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateCourseDto: UpdateCourseDto,
+  ) {
+    return await this.courseService.update(id, updateCourseDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.courseService.remove(+id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return await this.courseService.remove(id);
   }
 }

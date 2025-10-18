@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAttendanceDto } from './dto/create-attendance.dto';
-import { UpdateAttendanceDto } from './dto/update-attendance.dto';
+import { CreateAttendanceDto } from './dto/create-attendance.dto.js';
+import { UpdateAttendanceDto } from './dto/update-attendance.dto.js';
 
 @Injectable()
 export class AttendanceService {

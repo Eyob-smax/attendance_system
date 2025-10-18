@@ -70,7 +70,7 @@ model Student {
 model Course {
   course_id    Int       @id @default(autoincrement())
   course_name  String    @db.VarChar(100)
-  description  String?   @db.Text
+  description  String?   @db.Text @default("none")
   course_dates CourseDate[]
 }
 

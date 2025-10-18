@@ -1,12 +1,20 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from './auth/auth.module';
-import { BatchesModule } from './batches/batches.module';
-import { CourseModule } from './course/course.module';
-import { AttendanceModule } from './attendance/attendance.module';
-import { DatabaseModule } from './database/database.module';
+import { AuthModule } from './auth/auth.module.js';
+import { BatchesModule } from './batches/batches.module.js';
+import { CourseModule } from './course/course.module.js';
+import { AttendanceModule } from './attendance/attendance.module.js';
+import { DatabaseModule } from './database/database.module.js';
+import { RedisModule } from './redis/redis.module.js';
 
 @Module({
-  imports: [AuthModule, BatchesModule, CourseModule, AttendanceModule, DatabaseModule],
+  imports: [
+    DatabaseModule,
+    AuthModule,
+    BatchesModule,
+    CourseModule,
+    AttendanceModule,
+    RedisModule,
+  ],
   controllers: [],
   providers: [],
 })

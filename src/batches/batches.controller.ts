@@ -1,13 +1,31 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { BatchesService } from './batches.service';
-import { CreateBatchDto } from './dto/create-batch.dto';
-import { UpdateBatchDto } from './dto/update-batch.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
+import { BatchesService } from './batches.service.js';
+import { CreateBatchDto } from './dto/create-batch.dto.js';
+import { UpdateBatchDto } from './dto/update-batch.dto.js';
 
 @Controller('batches')
 export class BatchesController {
   constructor(private readonly batchesService: BatchesService) {}
 
   @Post()
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: true,
+    }),
+  )
   create(@Body() createBatchDto: CreateBatchDto) {
     return this.batchesService.create(createBatchDto);
   }
@@ -18,17 +36,27 @@ export class BatchesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.batchesService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.batchesService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBatchDto: UpdateBatchDto) {
-    return this.batchesService.update(+id, updateBatchDto);
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: true,
+    }),
+  )
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateBatchDto: UpdateBatchDto,
+  ) {
+    return this.batchesService.update(id, updateBatchDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.batchesService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.batchesService.remove(id);
   }
 }
