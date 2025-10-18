@@ -5,6 +5,7 @@ import { CourseModule } from './course/course.module.js';
 import { AttendanceModule } from './attendance/attendance.module.js';
 import { DatabaseModule } from './database/database.module.js';
 import { RedisModule } from './redis/redis.module.js';
+import { CourseDateModule } from './course-date/course-date.module.js';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { RedisModule } from './redis/redis.module.js';
     CourseModule,
     AttendanceModule,
     RedisModule,
+    CourseDateModule,
   ],
   controllers: [],
   providers: [],
