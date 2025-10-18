@@ -9,12 +9,15 @@ import {
   ParseIntPipe,
   UsePipes,
   ValidationPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 import { BatchesService } from './batches.service.js';
 import { CreateBatchDto } from './dto/create-batch.dto.js';
 import { UpdateBatchDto } from './dto/update-batch.dto.js';
+import { BatchInterceptor } from './interceptor/batch.interceptor.js';
 
 @Controller('batches')
+@UseInterceptors(BatchInterceptor)
 export class BatchesController {
   constructor(private readonly batchesService: BatchesService) {}
 
