@@ -6,48 +6,39 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
-import { Observable } from 'rxjs';
 import { verify } from '../utils/authUtil.js';
 import { JwtPayload } from 'jsonwebtoken';
 
-interface AuthUser {
+interface AuthUser extends JwtPayload {
   id: number;
   username: string;
-}
-
-interface AuthenticatedRequest extends Request {
-  user?: AuthUser | JwtPayload;
+  role: string;
 }
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private readonly config: ConfigService) {}
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
-    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest<Request>();
+    const token = request.cookies?.token;
 
-    const token = request.cookies.token;
-    const secret = this.config.get<string>('JWT_SECRET');
-
-    if (!token) {
+    if (!token)
       throw new UnauthorizedException('Authentication token not found.');
-    }
+
+    const secret = this.config.get<string>('JWT_SECRET');
+    if (!secret) throw new UnauthorizedException('JWT secret not configured.');
 
     try {
-      const decoded = verify(token, secret);
+      const decoded = verify(token, secret) as AuthUser;
 
-      if (!decoded) {
-        throw new UnauthorizedException('Session invalid, Unauthorized');
+      if (!decoded || !decoded.id) {
+        throw new UnauthorizedException('Invalid authentication token.');
       }
 
-      console.log(decoded);
-
-      request.user = decoded as AuthUser;
-
+      (request as any).user = decoded;
       return true;
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException(
         'Invalid or expired authentication token.',
       );

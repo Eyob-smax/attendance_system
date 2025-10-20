@@ -9,7 +9,6 @@ import {
 import { AuthService } from './auth.service.js';
 import { CreateAuthDto } from './dto/auth.dto.js';
 import type { Response } from 'express';
-import { AuthGuard } from '../common/guard/auth.guard.js';
 
 @Controller('auth')
 export class AuthController {

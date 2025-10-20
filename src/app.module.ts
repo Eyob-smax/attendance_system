@@ -7,6 +7,7 @@ import { DatabaseModule } from './database/database.module.js';
 import { RedisModule } from './redis/redis.module.js';
 import { CourseDateModule } from './course-date/course-date.module.js';
 import { ConfigModule } from '@nestjs/config';
+import { UsersModule } from './users/users.module.js';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    UsersModule,
   ],
   controllers: [],
   providers: [],
