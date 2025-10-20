@@ -6,6 +6,7 @@ import { AttendanceModule } from './attendance/attendance.module.js';
 import { DatabaseModule } from './database/database.module.js';
 import { RedisModule } from './redis/redis.module.js';
 import { CourseDateModule } from './course-date/course-date.module.js';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -16,6 +17,11 @@ import { CourseDateModule } from './course-date/course-date.module.js';
     AttendanceModule,
     RedisModule,
     CourseDateModule,
+    ConfigModule.forRoot({
+      cache: true,
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
   ],
   controllers: [],
   providers: [],

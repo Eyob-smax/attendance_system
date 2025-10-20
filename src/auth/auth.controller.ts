@@ -1,7 +1,36 @@
-import { Controller } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Res,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { AuthService } from './auth.service.js';
+import { CreateAuthDto } from './dto/auth.dto.js';
+import type { Response } from 'express';
+import { AuthGuard } from '../common/guard/auth.guard.js';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+  @Post()
+  async login(
+    @Body(ValidationPipe) authDto: CreateAuthDto,
+    @Res() res: Response,
+  ) {
+    const result = await this.authService.login(authDto);
+    if (result.user.id) {
+      res.cookie('token', result.token, {
+        secure: false,
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60,
+      });
+    }
+
+    return {
+      message: result.message,
+      user: result.user,
+    };
+  }
 }
