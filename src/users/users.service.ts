@@ -114,7 +114,13 @@ export class UsersService {
 
       return {
         message: 'User updated successfully',
-        user: updatedUser,
+        user: {
+          id: updatedUser.user_id,
+          email: updatedUser.email,
+          username: updatedUser.username,
+          student_id: updatedUser.student_id,
+          role: updatedUser.role,
+        },
       };
     } catch (err) {
       throw mapPrismaErrorToHttp(err);

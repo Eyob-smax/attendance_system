@@ -58,7 +58,9 @@ export class RoleGuard implements CanActivate {
 
     const hasPermission = requiredRoles.includes(userRole);
     if (!hasPermission) {
-      throw new ForbiddenException(`Role "${userRole}" is not authorized.`);
+      throw new ForbiddenException(
+        `Role "${userRole}" is not authorized. You should have a role ${JSON.stringify(requiredRoles)} to access this route!`,
+      );
     }
 
     return true;

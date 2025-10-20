@@ -10,6 +10,8 @@ import { CreateAuthDto } from './dto/auth.dto';
 import bcrypt from 'bcrypt';
 import { mapPrismaErrorToHttp } from '../common/utils/handleDbError.js';
 import jwt from 'jsonwebtoken';
+import { hashPassword } from '../common/utils/authUtil.js';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -69,6 +71,20 @@ export class AuthService {
         mapPrismaErrorToHttp(err) ||
         new InternalServerErrorException('Login failed')
       );
+    }
+  }
+
+  async logout(res: Response) {
+    try {
+      res.clearCookie('token', {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'strict',
+      });
+
+      return { message: 'Logout successful' };
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to logout');
     }
   }
 }
