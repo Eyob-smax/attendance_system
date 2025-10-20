@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  ValidationPipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service.js';
 import { CreateAttendanceDto } from './dto/create-attendance.dto.js';
@@ -16,7 +18,10 @@ export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}
 
   @Post()
-  create(@Body() createAttendanceDto: CreateAttendanceDto) {
+  create(
+    @Body(new ValidationPipe({ forbidNonWhitelisted: true, whitelist: true }))
+    createAttendanceDto: CreateAttendanceDto,
+  ) {
     return this.attendanceService.create(createAttendanceDto);
   }
 
@@ -26,20 +31,21 @@ export class AttendanceController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.attendanceService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.attendanceService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
-    @Body() updateAttendanceDto: UpdateAttendanceDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Body(new ValidationPipe({ forbidNonWhitelisted: true, whitelist: true }))
+    updateAttendanceDto: UpdateAttendanceDto,
   ) {
-    return this.attendanceService.update(+id, updateAttendanceDto);
+    return this.attendanceService.update(id, updateAttendanceDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.attendanceService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.attendanceService.remove(id);
   }
 }
