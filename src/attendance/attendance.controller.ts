@@ -8,12 +8,18 @@ import {
   Delete,
   ValidationPipe,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service.js';
 import { CreateAttendanceDto } from './dto/create-attendance.dto.js';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto.js';
+import { AuthGuard } from '../common/guard/auth.guard.js';
+import { RoleGuard } from '../common/guard/role.guard.js';
+import { Role } from '../common/decorators/role.decorator.js';
 
 @Controller('attendance')
+@UseGuards(AuthGuard, RoleGuard)
+@Role(['super-admin'])
 export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}
 

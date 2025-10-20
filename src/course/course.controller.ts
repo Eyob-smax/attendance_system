@@ -8,13 +8,19 @@ import {
   Delete,
   ParseIntPipe,
   UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 import { CourseService } from './course.service.js';
 import { CreateCourseDto } from './dto/create-course.dto.js';
 import { UpdateCourseDto } from './dto/update-course.dto.js';
 import { CourseInterceptor } from './interceptors/courses.interceptor.js';
+import { AuthGuard } from '../common/guard/auth.guard.js';
+import { RoleGuard } from '../common/guard/role.guard.js';
+import { Role } from '../common/decorators/role.decorator.js';
 
 @Controller('course')
+@UseGuards(AuthGuard, RoleGuard)
+@Role(['super-admin'])
 @UseInterceptors(CourseInterceptor)
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}

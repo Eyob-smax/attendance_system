@@ -9,12 +9,18 @@ import {
   ParseIntPipe,
   UsePipes,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { CourseDateService } from './course-date.service.js';
 import { CreateCourseDateDto } from './dto/create-course-date.dto.js';
 import { UpdateCourseDateDto } from './dto/update-course-date.dto.js';
+import { AuthGuard } from '../common/guard/auth.guard.js';
+import { RoleGuard } from '../common/guard/role.guard.js';
+import { Role } from '../common/decorators/role.decorator.js';
 
 @Controller('course_date')
+@UseGuards(AuthGuard, RoleGuard)
+@Role(['super-admin'])
 export class CourseDateController {
   constructor(private readonly courseDateService: CourseDateService) {}
 
