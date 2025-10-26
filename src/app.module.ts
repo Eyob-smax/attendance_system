@@ -4,10 +4,11 @@ import { BatchesModule } from './batches/batches.module.js';
 import { CourseModule } from './course/course.module.js';
 import { AttendanceModule } from './attendance/attendance.module.js';
 import { DatabaseModule } from './database/database.module.js';
-import { RedisModule } from './redis/redis.module.js';
+// import { RedisModule } from './redis/redis.module.js';
 import { CourseDateModule } from './course-date/course-date.module.js';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module.js';
+import { GetStudentsModule } from './get-students/get-students.module.js';
 
 @Module({
   imports: [
@@ -16,7 +17,6 @@ import { UsersModule } from './users/users.module.js';
     BatchesModule,
     CourseModule,
     AttendanceModule,
-    RedisModule,
     CourseDateModule,
     ConfigModule.forRoot({
       cache: true,
@@ -24,6 +24,7 @@ import { UsersModule } from './users/users.module.js';
       envFilePath: '.env',
     }),
     UsersModule,
+    GetStudentsModule,
   ],
   controllers: [],
   providers: [],

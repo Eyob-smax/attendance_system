@@ -1,10 +1,10 @@
-import { IsBoolean, IsOptional, IsPositive } from 'class-validator';
+import { IsBoolean, IsOptional, IsPositive, IsString } from 'class-validator';
 
 export class CreateAttendanceDto {
   @IsBoolean()
   is_present: boolean;
-  @IsPositive()
-  student_id: number;
+  @IsString()
+  student_id: string;
   @IsPositive()
   date_id: number;
   @IsOptional()

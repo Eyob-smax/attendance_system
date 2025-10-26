@@ -15,7 +15,7 @@ import {
 import { BatchesService } from './batches.service.js';
 import { CreateBatchDto } from './dto/create-batch.dto.js';
 import { UpdateBatchDto } from './dto/update-batch.dto.js';
-import { BatchInterceptor } from './interceptor/batch.interceptor.js';
+// import { BatchInterceptor } from './interceptor/batch.interceptor.js';
 import { Role } from '../common/decorators/role.decorator.js';
 import { AuthGuard } from '../common/guard/auth.guard.js';
 import { RoleGuard } from '../common/guard/role.guard.js';
@@ -23,10 +23,9 @@ import { RoleGuard } from '../common/guard/role.guard.js';
 @Controller('batches')
 @UseGuards(AuthGuard, RoleGuard)
 @Role(['super-admin'])
-@UseInterceptors(BatchInterceptor)
+// @UseInterceptors(BatchInterceptor)
 export class BatchesController {
   constructor(private readonly batchesService: BatchesService) {}
-
   @Post()
   @UsePipes(
     new ValidationPipe({
