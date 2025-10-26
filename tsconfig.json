@@ -6,6 +6,7 @@
     "esModuleInterop": true,
     "isolatedModules": true,
     "declaration": true,
+    "typeRoots": ["./node_modules/@types", "./src/common/types"],
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
