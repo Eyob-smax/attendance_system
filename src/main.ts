@@ -1,16 +1,24 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
-import cookieParse from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 import { Request, Response } from 'express';
+
+let server: any;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.use(cookieParse());
+  app.use(cookieParser());
+
   const expressApp = app.getHttpAdapter().getInstance();
 
   expressApp.get('/', (req: Request, res: Response) => {
-    res.send('/Attendance API is running!');
+    res.send('Attendance API is running on Vercel!');
   });
-  await app.listen(process.env.PORT ?? 9800);
+
+  await app.init();
+  server = expressApp;
 }
+
 await bootstrap();
+
+export default server;
