@@ -21,24 +21,24 @@ export class AuthGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
-    const token = request.cookies?.token;
+    const token = request.cookies?.['access_token'];
+    if (!token) throw new UnauthorizedException('ACCESS_TOKEN_NOT_FOUND');
 
-    if (!token)
-      throw new UnauthorizedException('Authentication token not found.');
-
-    const secret = this.config.get<string>('JWT_SECRET');
-    if (!secret) throw new UnauthorizedException('JWT secret not configured.');
+    const access_token_secret = this.config.get<string>('JWT_ACCESS_SECRET');
+    if (!access_token_secret)
+      throw new UnauthorizedException('JWT_TOKEN_NOT_CONFIGURED');
 
     try {
-      const decoded = verify(token, secret) as AuthUser;
+      const decoded = verify(token, access_token_secret) as AuthUser;
 
       if (!decoded || !decoded.id) {
-        throw new UnauthorizedException('Invalid authentication token.');
+        throw new UnauthorizedException('INVALID_ACCESS_TOKEN');
       }
 
       request.user = decoded;
       return true;
     } catch (err) {
+      console.log(err);
       if (err.name === 'TokenExpiredError') {
         throw new UnauthorizedException('ACCESS_TOKEN_EXPIRED');
       }

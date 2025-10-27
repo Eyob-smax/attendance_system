@@ -1,4 +1,5 @@
 import { Global, Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { createClient } from 'redis';
 @Global()
 @Module({
@@ -6,10 +7,14 @@ import { createClient } from 'redis';
   providers: [
     {
       provide: 'REDIS_CLIENT',
-      useFactory: async () => {
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => {
         try {
-          const redisClient = createClient({ url: 'redis://localhost:6379' });
+          const redisClient = createClient({
+            url: config.get<string>('REDIS_URL'),
+          });
           await redisClient.connect();
+          console.log('✅ Connected to Redis successfully!');
           return redisClient;
         } catch (err) {
           console.error("Can't connect with the DB! " + err.message);

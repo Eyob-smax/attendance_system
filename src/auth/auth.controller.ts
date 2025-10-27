@@ -8,11 +8,17 @@ import {
   ValidationPipe,
   UnauthorizedException,
   Req,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { CreateAuthDto } from './dto/auth.dto.js';
 import type { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import {
+  ACCESS_TOKEN_EX_NUM,
+  REFRESH_TOKEN_EX_NUM,
+} from '../common/constants/constants.js';
 
 @Controller('auth')
 export class AuthController {
@@ -22,6 +28,7 @@ export class AuthController {
   ) {}
 
   @Post('login')
+  @HttpCode(200)
   async login(
     @Body(ValidationPipe) authDto: CreateAuthDto,
     @Res({ passthrough: true }) res: Response,
@@ -35,7 +42,7 @@ export class AuthController {
         this.config.get<'production' | 'development'>('NODE_ENV') ===
         'production',
       sameSite: 'strict',
-      maxAge: 1000 * 60 * 5,
+      maxAge: ACCESS_TOKEN_EX_NUM,
     });
 
     res.cookie('refresh_token', refreshToken, {
@@ -44,7 +51,7 @@ export class AuthController {
         this.config.get<'production' | 'development'>('NODE_ENV') ===
         'production',
       sameSite: 'strict',
-      maxAge: 1000 * 60 * 60 * 24 * 7,
+      maxAge: REFRESH_TOKEN_EX_NUM,
     });
 
     return {
@@ -54,6 +61,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @HttpCode(200)
   async refresh(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
@@ -71,7 +79,7 @@ export class AuthController {
         this.config.get<'production' | 'development'>('NODE_ENV') ===
         'production',
       sameSite: 'strict',
-      maxAge: 1000 * 60 * 5,
+      maxAge: ACCESS_TOKEN_EX_NUM,
     });
 
     res.cookie('refresh_token', newRefreshToken, {
@@ -80,7 +88,7 @@ export class AuthController {
         this.config.get<'production' | 'development'>('NODE_ENV') ===
         'production',
       sameSite: 'strict',
-      maxAge: 1000 * 60 * 60 * 24 * 7,
+      maxAge: REFRESH_TOKEN_EX_NUM,
     });
 
     return { message: 'Tokens refreshed successfully' };

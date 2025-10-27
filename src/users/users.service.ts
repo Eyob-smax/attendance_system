@@ -85,12 +85,10 @@ export class UsersService {
   async findOne(id: number) {
     const user = await this.databaseService.user.findUnique({
       where: { user_id: id },
-      select: {
-        user_id: true,
-        username: true,
-        student_id: true,
-        email: true,
-        role: true,
+      include: {
+        student: true,
+        attendances: true,
+        refreshTokens: true,
       },
     });
 

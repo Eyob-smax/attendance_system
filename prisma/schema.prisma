@@ -17,84 +17,84 @@ model RefreshToken {
   user       User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
-
 model User {
-  user_id       Int       @id @default(autoincrement())
-  username      String    @unique @db.VarChar(50)
-  student_id    String    @unique   @db.VarChar(255)
-  password_hash String    @db.VarChar(255)
-  role          String    @db.VarChar(20) 
-  email         String?   @unique @db.VarChar(100)
-  attendances   Attendance[]
-  refreshTokens RefreshToken[]
+  user_id         Int         @id @default(autoincrement())
+  username        String      @unique @db.VarChar(50)
+  student_id      String      @unique @db.VarChar(255)
+  password_hash   String      @db.VarChar(255)
+  role            String      @db.VarChar(20) 
+  email           String?     @unique @db.VarChar(100)
+  student         Student?    @relation("UserToStudent", fields: [student_id], references: [student_id], onDelete: Cascade, onUpdate: Cascade)
+  attendances     Attendance[] @relation("RecordedBy")
+  refreshTokens   RefreshToken[]
+}
+
+model Student {
+  student_id         String      @id
+  first_name         String      @db.VarChar(50)
+  last_name          String      @db.VarChar(50)
+  email              String      @unique @db.VarChar(100)
+  phone_number       String?     @unique @db.VarChar(20)
+  enrollment_date    DateTime    @default(now()) @db.Date
+  is_certified       Boolean     @default(false)
+  has_consented      Boolean     @default(false)
+  current_batch_id   Int?
+  current_batch      Batch?      @relation(fields: [current_batch_id], references: [batch_id], onDelete: SetNull, onUpdate: Cascade)
+  user               User?       @relation("UserToStudent")
+  attendances        Attendance[]
+  certificate        Certificate?
 }
 
 model Batch {
-  batch_id     Int       @id @default(autoincrement())
-  batch_name   String    @unique @db.VarChar(50)
-  start_date   DateTime  @db.Date
-  end_date     DateTime? @db.Date
-  is_completed Boolean?   @default(false)
+  batch_id     Int          @id @default(autoincrement())
+  batch_name   String       @unique @db.VarChar(50)
+  start_date   DateTime     @db.Date
+  end_date     DateTime?    @db.Date
+  is_completed Boolean?     @default(false)
   students     Student[]
   course_dates CourseDate[]
   certificates Certificate[]
 }
 
 model Course {
-  course_id    Int       @id @default(autoincrement())
-  course_name  String    @db.VarChar(100)
-  description  String?   @db.Text @default("none")
-  course_dates CourseDate[] 
-}
-
-model Student {
-  student_id         String    @id()
-  first_name         String    @db.VarChar(50)
-  last_name          String    @db.VarChar(50)
-  email              String    @unique @db.VarChar(100)
-  phone_number       String?   @unique @db.VarChar(20)  
-  enrollment_date    DateTime  @default(now()) @db.Date
-  is_certified       Boolean   @default(false)
-  has_consented      Boolean   @default(false) 
-  current_batch_id   Int?
-  current_batch      Batch?     @relation(fields: [current_batch_id], references: [batch_id], onDelete: SetNull, onUpdate: Cascade)
-  attendances        Attendance[]
-  certificate        Certificate?
+  course_id    Int          @id @default(autoincrement())
+  course_name  String       @db.VarChar(100)
+  description  String?      @db.Text @default("none")
+  course_dates CourseDate[]
 }
 
 model CourseDate {
-  date_id    Int      @id @default(autoincrement())
-  class_date DateTime @db.Date
-  start_time DateTime?  @db.Time(0) 
+  date_id    Int         @id @default(autoincrement())
+  class_date DateTime    @db.Date
+  start_time DateTime?   @db.Time(0)
   course_id  Int
-  course     Course   @relation(fields: [course_id], references: [course_id], onDelete: Restrict, onUpdate: Cascade)
+  course     Course      @relation(fields: [course_id], references: [course_id], onDelete: Restrict, onUpdate: Cascade)
   batch_id   Int
-  batch      Batch    @relation(fields: [batch_id], references: [batch_id], onDelete: Restrict, onUpdate: Cascade)
-  @@unique([batch_id, course_id, class_date])
+  batch      Batch       @relation(fields: [batch_id], references: [batch_id], onDelete: Restrict, onUpdate: Cascade)
   attendances Attendance[]
+  @@unique([batch_id, course_id, class_date])
 }
 
 model Attendance {
-  attendance_id          BigInt    @id @default(autoincrement())
-  is_present             Boolean
-  recorded_at            DateTime  @default(now()) @db.Timestamptz()
-  student_id             String
-  student                Student   @relation(fields: [student_id], references: [student_id], onDelete: Cascade, onUpdate: Cascade)
-  date_id                Int
-  course_date            CourseDate @relation(fields: [date_id], references: [date_id], onDelete: Restrict, onUpdate: Cascade)
-  recorded_by_user_id    Int?
-  recorded_by            User?     @relation(fields: [recorded_by_user_id], references: [user_id], onDelete: SetNull, onUpdate: Cascade)
-
+  attendance_id       BigInt      @id @default(autoincrement())
+  is_present          Boolean
+  recorded_at         DateTime    @default(now()) @db.Timestamptz()
+  student_id          String
+  student             Student     @relation(fields: [student_id], references: [student_id], onDelete: Cascade, onUpdate: Cascade)
+  date_id             Int
+  course_date         CourseDate  @relation(fields: [date_id], references: [date_id], onDelete: Restrict, onUpdate: Cascade)
+  recorded_by_user_id Int?
+  recorded_by         User?       @relation("RecordedBy", fields: [recorded_by_user_id], references: [user_id], onDelete: SetNull, onUpdate: Cascade)
   @@unique([student_id, date_id])
   @@map("Attendance")
 }
 
 model Certificate {
-  certificate_id Int      @id @default(autoincrement())
-  date_issued    DateTime @default(now()) @db.Date
-  certificate_url String?  @db.VarChar(255)
-  student_id     String      @unique
-  student        Student  @relation(fields: [student_id], references: [student_id], onDelete: Cascade, onUpdate: Cascade)
-  batch_id       Int
-  batch          Batch    @relation(fields: [batch_id], references: [batch_id], onDelete: Restrict, onUpdate: Cascade)
+  certificate_id  Int        @id @default(autoincrement())
+  date_issued     DateTime   @default(now()) @db.Date
+  certificate_url String?    @db.VarChar(255)
+  student_id      String     @unique
+  student         Student    @relation(fields: [student_id], references: [student_id], onDelete: Cascade, onUpdate: Cascade)
+  batch_id        Int
+  batch           Batch      @relation(fields: [batch_id], references: [batch_id], onDelete: Restrict, onUpdate: Cascade)
 }

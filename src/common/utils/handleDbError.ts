@@ -4,13 +4,35 @@ import {
   ForbiddenException,
   GatewayTimeoutException,
   InternalServerErrorException,
+  NotAcceptableException,
   NotFoundException,
+  PayloadTooLargeException,
   ServiceUnavailableException,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
 export function mapPrismaErrorToHttp(error: unknown): Error {
+  // Check if the error is already a known NestJS HTTP exception
+  if (
+    error instanceof BadRequestException ||
+    error instanceof ConflictException ||
+    error instanceof ForbiddenException ||
+    error instanceof GatewayTimeoutException ||
+    error instanceof NotFoundException ||
+    error instanceof ServiceUnavailableException ||
+    error instanceof UnauthorizedException ||
+    error instanceof NotAcceptableException ||
+    error instanceof UnprocessableEntityException ||
+    error instanceof InternalServerErrorException ||
+    error instanceof PayloadTooLargeException ||
+    error instanceof ServiceUnavailableException ||
+    error instanceof ForbiddenException
+  ) {
+    return error;
+  }
+
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     const meta = error.meta || {};
     const target = Array.isArray(meta.target)
@@ -146,11 +168,14 @@ export function mapPrismaErrorToHttp(error: unknown): Error {
     }
   }
 
+  // Fallback for non-Prisma, non-NestJS HTTP exceptions
   if (error instanceof Error) {
     return new InternalServerErrorException(
       `Unexpected server error: ${error.message}`,
     );
   }
 
-  return new InternalServerErrorException('An unknown error occurred.');
+  return new InternalServerErrorException(
+    'An unknown error occurred.' + (error as Error).message,
+  );
 }

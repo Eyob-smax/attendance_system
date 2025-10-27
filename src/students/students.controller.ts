@@ -6,33 +6,33 @@ import {
   Param,
   Patch,
   Post,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { GetStudentsService } from './get-students.service.js';
+import { StudentsService } from './students.service.js';
 import { CreateStudentDTO } from './dto/create.dto.js';
 import { UpdateStudentDto } from './dto/update.dto.js';
-
 @Controller('student')
-export class GetStudentsController {
-  constructor(private readonly getStudentsService: GetStudentsService) {}
+export class StudentsController {
+  constructor(private readonly getStudentsService: StudentsService) {}
 
   @Get()
   async getAll() {
     return await this.getStudentsService.getAllStudents();
   }
-  @Get()
+  @Get(':student_id')
   async getOne(@Param('student_id') student_id: string) {
     return await this.getStudentsService.getStudentById(student_id);
   }
 
-  @Post('/add')
+  @Post()
   @UsePipes(new ValidationPipe({ whitelist: true }))
   async addStudent(@Body() studentDto: CreateStudentDTO) {
     return await this.getStudentsService.addStudent(studentDto);
   }
 
-  @Patch('/edit/:student_id')
+  @Patch(':student_id')
   @UsePipes(new ValidationPipe({ whitelist: true }))
   async editStudent(
     @Param('student_id') student_id: string,

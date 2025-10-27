@@ -11,6 +11,10 @@ import { CreateAuthDto } from './dto/auth.dto';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { mapPrismaErrorToHttp } from '../common/utils/handleDbError.js';
+import {
+  ACCESS_TOKEN_EX_STR,
+  REFRESH_TOKEN_EX_NUM,
+} from '../common/constants/constants.js';
 
 @Injectable()
 export class AuthService {
@@ -53,15 +57,15 @@ export class AuthService {
       };
 
       const accessToken = jwt.sign(payload, accessSecret, {
-        expiresIn: '5m',
+        expiresIn: ACCESS_TOKEN_EX_STR,
       });
 
       const refreshToken = jwt.sign(payload, refreshSecret, {
-        expiresIn: '7d',
+        expiresIn: ACCESS_TOKEN_EX_STR,
       });
 
       const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      const expiresAt = new Date(Date.now() + REFRESH_TOKEN_EX_NUM);
 
       await this.databaseService.refreshToken.create({
         data: {
@@ -83,10 +87,7 @@ export class AuthService {
       };
     } catch (err) {
       console.error('Login error:', err);
-      throw (
-        mapPrismaErrorToHttp(err) ||
-        new InternalServerErrorException('Login failed')
-      );
+      throw mapPrismaErrorToHttp(err);
     }
   }
 
@@ -128,10 +129,10 @@ export class AuthService {
       };
 
       const newAccessToken = jwt.sign(payload, accessSecret, {
-        expiresIn: '5m',
+        expiresIn: ACCESS_TOKEN_EX_STR,
       });
       const newRefreshToken = jwt.sign(payload, refreshSecret, {
-        expiresIn: '7d',
+        expiresIn: REFRESH_TOKEN_EX_NUM,
       });
       const hashedNewToken = await bcrypt.hash(newRefreshToken, 10);
 
@@ -139,19 +140,16 @@ export class AuthService {
         data: {
           user_id: user.user_id,
           token: hashedNewToken,
-          expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          expires_at: new Date(Date.now() + REFRESH_TOKEN_EX_NUM),
         },
       });
 
       return { newAccessToken, newRefreshToken };
     } catch (err) {
-      console.error('Refresh error:', err);
       if (err.name === 'TokenExpiredError') {
         throw new UnauthorizedException('REFRESH_TOKEN_EXPIRED');
       }
-      throw new InternalServerErrorException(
-        'Something went wrong: ' + err.message,
-      );
+      throw mapPrismaErrorToHttp(err);
     }
   }
 
@@ -167,9 +165,7 @@ export class AuthService {
 
       return { message: 'Logout successful' };
     } catch (error) {
-      throw new InternalServerErrorException(
-        'Failed to logout: ' + error.message,
-      );
+      throw mapPrismaErrorToHttp(error);
     }
   }
 }

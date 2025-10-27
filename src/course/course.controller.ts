@@ -20,7 +20,6 @@ import { Role } from '../common/decorators/role.decorator.js';
 @Controller('course')
 @UseGuards(AuthGuard, RoleGuard)
 @Role(['super-admin'])
-// @UseInterceptors(CourseInterceptor)
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 

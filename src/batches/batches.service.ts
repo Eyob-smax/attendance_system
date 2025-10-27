@@ -40,7 +40,9 @@ export class BatchesService {
 
   async findAll() {
     try {
-      const batches = await this.databaseService.batch.findMany();
+      const batches = await this.databaseService.batch.findMany({
+        include: { course_dates: true, students: true },
+      });
       return {
         batches,
       };
@@ -53,6 +55,7 @@ export class BatchesService {
     try {
       const batch = await this.databaseService.batch.findUnique({
         where: { batch_id: id },
+        include: { course_dates: true, students: true },
       });
 
       if (!batch) {

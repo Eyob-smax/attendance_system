@@ -8,6 +8,18 @@ import { mapPrismaErrorToHttp } from '../common/utils/handleDbError.js';
 export class AttendanceService {
   constructor(private readonly databaseService: DatabaseService) {}
 
+  private serializeAttendance(attendance: any) {
+    if (!attendance) return attendance;
+    return {
+      ...attendance,
+      attendance_id: attendance.attendance_id.toString(),
+      student_id:
+        typeof attendance.student_id === 'bigint'
+          ? attendance.student_id.toString()
+          : attendance.student_id,
+    };
+  }
+
   async create(createAttendanceDto: CreateAttendanceDto) {
     try {
       if (!createAttendanceDto.is_present || !createAttendanceDto.student_id) {
@@ -21,7 +33,7 @@ export class AttendanceService {
       });
 
       return {
-        attendance: createdAttendance,
+        attendance: this.serializeAttendance(createdAttendance),
         message: 'Attendance created successfully!',
       };
     } catch (err) {
@@ -31,11 +43,19 @@ export class AttendanceService {
 
   async findAll() {
     try {
-      const attendanceRecords =
-        await this.databaseService.attendance.findMany();
+      const attendanceRecords = await this.databaseService.attendance.findMany({
+        include: {
+          course_date: {
+            include: { course: true, batch: true },
+          },
+          student: true,
+        },
+      });
 
       return {
-        attendanceRecords,
+        attendanceRecords: attendanceRecords.map((rec) =>
+          this.serializeAttendance(rec),
+        ),
         message: 'All attendance records retrieved successfully!',
       };
     } catch (err) {
@@ -50,7 +70,8 @@ export class AttendanceService {
       }
 
       const attendance = await this.databaseService.attendance.findUnique({
-        where: { attendance_id: id },
+        where: { attendance_id: BigInt(id) },
+        include: { course_date: true, student: true },
       });
 
       if (!attendance) {
@@ -58,7 +79,7 @@ export class AttendanceService {
       }
 
       return {
-        attendance,
+        attendance: this.serializeAttendance(attendance),
         message: `Attendance record #${id} retrieved successfully!`,
       };
     } catch (err) {
@@ -79,12 +100,12 @@ export class AttendanceService {
       }
 
       const updatedAttendance = await this.databaseService.attendance.update({
-        where: { attendance_id: id },
+        where: { attendance_id: BigInt(id) },
         data: updateAttendanceDto,
       });
 
       return {
-        attendance: updatedAttendance,
+        attendance: this.serializeAttendance(updatedAttendance),
         message: `Attendance record #${id} updated successfully!`,
       };
     } catch (err) {
@@ -99,11 +120,11 @@ export class AttendanceService {
       }
 
       const removedAttendance = await this.databaseService.attendance.delete({
-        where: { attendance_id: id },
+        where: { attendance_id: BigInt(id) },
       });
 
       return {
-        attendance: removedAttendance,
+        attendance: this.serializeAttendance(removedAttendance),
         message: `Attendance record #${id} removed successfully!`,
       };
     } catch (err) {

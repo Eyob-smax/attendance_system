@@ -5,7 +5,8 @@ import {
 } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service.js';
 import { ConfigService } from '@nestjs/config';
-import { UniversityUser, User } from 'src/common/utils/types.js';
+import { User } from 'src/common/utils/types.js';
+import { mapPrismaErrorToHttp } from '../common/utils/handleDbError.js';
 
 type TStudent = {
   student_id: string;
@@ -20,7 +21,7 @@ type TStudent = {
 };
 
 @Injectable()
-export class GetStudentsService {
+export class StudentsService {
   private studentApi: string;
 
   constructor(
@@ -61,7 +62,7 @@ export class GetStudentsService {
       };
     } catch (err) {
       console.error('Error fetching students:', err);
-      throw new BadRequestException('Failed to fetch or add students');
+      throw mapPrismaErrorToHttp(err);
     }
   }
 
@@ -87,7 +88,11 @@ export class GetStudentsService {
         where: { student_id },
       });
 
-      if (existingStudent) return;
+      if (existingStudent) {
+        throw new BadRequestException(
+          `Student with ${student_id} already created!`,
+        );
+      }
 
       const createdStudent = await this.databaseService.student.create({
         data: {
@@ -105,8 +110,7 @@ export class GetStudentsService {
 
       return { createdStudent, message: 'Created student' };
     } catch (err) {
-      console.error('Error adding student:', err);
-      throw new BadRequestException('Error adding student');
+      throw mapPrismaErrorToHttp(err);
     }
   }
 
@@ -114,10 +118,24 @@ export class GetStudentsService {
     try {
       return await this.databaseService.student.findMany({
         orderBy: { enrollment_date: 'desc' },
+        include: {
+          attendances: {
+            omit: {
+              student_id: true,
+              attendance_id: true,
+            },
+            include: {
+              course_date: {
+                include: { course: true, batch: true },
+              },
+            },
+          },
+          current_batch: true,
+        },
       });
     } catch (err) {
       console.error('Error fetching students:', err);
-      throw new BadRequestException('Error fetching students');
+      throw mapPrismaErrorToHttp(err);
     }
   }
 
@@ -125,17 +143,20 @@ export class GetStudentsService {
     try {
       const student = await this.databaseService.student.findUnique({
         where: { student_id },
+        include: {
+          attendances: true,
+          current_batch: true,
+        },
       });
 
       if (!student) throw new NotFoundException('Student not found');
       return student;
     } catch (err) {
       console.error('Error fetching student:', err);
-      throw new BadRequestException('Error fetching student');
+      throw mapPrismaErrorToHttp(err);
     }
   }
 
-  // 🔹 Update
   async updateStudent(student_id: string, updates: Partial<TStudent>) {
     try {
       const existing = await this.databaseService.student.findUnique({
@@ -151,11 +172,10 @@ export class GetStudentsService {
       return { updatedStudent, message: 'Student updated successfully' };
     } catch (err) {
       console.error('Error updating student:', err);
-      throw new BadRequestException('Error updating student');
+      throw mapPrismaErrorToHttp(err);
     }
   }
 
-  // 🔹 Delete
   async deleteStudent(student_id: string) {
     try {
       const existing = await this.databaseService.student.findUnique({
@@ -170,7 +190,7 @@ export class GetStudentsService {
       return { message: 'Student deleted successfully' };
     } catch (err) {
       console.error('Error deleting student:', err);
-      throw new BadRequestException('Error deleting student');
+      throw mapPrismaErrorToHttp(err);
     }
   }
 }

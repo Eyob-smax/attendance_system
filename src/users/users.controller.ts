@@ -18,7 +18,7 @@ import { RoleGuard } from '../common/guard/role.guard.js';
 import { AuthGuard } from '../common/guard/auth.guard.js';
 import { Role } from '../common/decorators/role.decorator.js';
 
-@Controller('users')
+@Controller('user')
 @UseGuards(AuthGuard, RoleGuard)
 @Role(['super-admin'])
 export class UsersController {
