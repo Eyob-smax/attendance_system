@@ -7,6 +7,7 @@ import {
 import { Request } from 'express';
 import type { RedisClientType } from 'redis';
 import { Observable } from 'rxjs';
+import { REDIS_EX_NUM } from '../constants/constants.js';
 
 export class CommonInterceptor implements NestInterceptor {
   constructor(
@@ -32,7 +33,7 @@ export class CommonInterceptor implements NestInterceptor {
             next: async (data) => {
               subscriber.next({ cached: false, data });
               subscriber.complete();
-              await this.redis.setEx(key, 60 * 60 * 24, JSON.stringify(data));
+              await this.redis.setEx(key, REDIS_EX_NUM, JSON.stringify(data));
             },
             error: (err) => subscriber.error(err),
           });
