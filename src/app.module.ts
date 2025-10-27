@@ -12,7 +12,8 @@ import { StudentsModule } from './students/students.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './tasks/tasks.module.js';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { CommonInterceptor } from './common/interceptors/common.interceptor.js';
+import { CommonInterceptor } from './common/interceptors/cache.interceptor.js';
+import { GeneralInterceptor } from './common/interceptors/common.interceptor.js';
 @Module({
   imports: [
     DatabaseModule,
@@ -34,6 +35,10 @@ import { CommonInterceptor } from './common/interceptors/common.interceptor.js';
   ],
   controllers: [],
   providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: GeneralInterceptor,
+    },
     {
       provide: APP_INTERCEPTOR,
       useClass: CommonInterceptor,

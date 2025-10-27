@@ -6,7 +6,6 @@ import {
   Param,
   Patch,
   Post,
-  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
