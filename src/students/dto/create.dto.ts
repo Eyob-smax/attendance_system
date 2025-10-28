@@ -8,6 +8,8 @@ export class CreateStudentDTO {
   @IsString()
   last_name: string;
   @IsString()
+  department: string;
+  @IsString()
   email: string;
   @IsDateString()
   enrollment_date: Date;

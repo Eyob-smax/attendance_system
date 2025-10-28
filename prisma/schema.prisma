@@ -38,6 +38,7 @@ model Student {
   enrollment_date    DateTime    @default(now()) @db.Date
   is_certified       Boolean     @default(false)
   has_consented      Boolean     @default(false)
+  department         String  
   current_batch_id   Int?
   current_batch      Batch?      @relation(fields: [current_batch_id], references: [batch_id], onDelete: SetNull, onUpdate: Cascade)
   user               User?       @relation("UserToStudent")
