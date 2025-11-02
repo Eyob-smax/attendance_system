@@ -29,6 +29,7 @@ model User {
   refreshTokens   RefreshToken[]
 }
 
+
 model Student {
   student_id         String      @id
   first_name         String      @db.VarChar(50)
@@ -42,6 +43,7 @@ model Student {
   current_batch_id   Int?
   current_batch      Batch?      @relation(fields: [current_batch_id], references: [batch_id], onDelete: SetNull, onUpdate: Cascade)
   user               User?       @relation("UserToStudent")
+  batches       StudentBatch[]
   attendances        Attendance[]
   certificate        Certificate?
 }
@@ -55,6 +57,21 @@ model Batch {
   students     Student[]
   course_dates CourseDate[]
   certificates Certificate[]
+  studentBatches StudentBatch[]
+}
+
+model StudentBatch {
+  id            Int      @id @default(autoincrement())
+  student_id    String
+  batch_id      Int
+  join_date     DateTime @default(now()) @db.Date
+  leave_date    DateTime? @db.Date 
+  is_active     Boolean  @default(true)
+  
+  student       Student  @relation(fields: [student_id], references: [student_id], onDelete: Cascade, onUpdate: Cascade)
+  batch         Batch    @relation(fields: [batch_id], references: [batch_id], onDelete: Restrict, onUpdate: Cascade)
+  
+  @@unique([student_id, batch_id])
 }
 
 model Course {

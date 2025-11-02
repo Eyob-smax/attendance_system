@@ -19,7 +19,7 @@ import { Role } from '../common/decorators/role.decorator.js';
 
 @Controller('attendance')
 @UseGuards(AuthGuard, RoleGuard)
-@Role(['super-admin'])
+@Role(['super-admin', 'admin'])
 export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}
 

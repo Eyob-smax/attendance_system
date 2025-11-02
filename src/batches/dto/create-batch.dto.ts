@@ -1,16 +1,20 @@
-import { IsString, IsBoolean, IsDateString, IsOptional } from 'class-validator';
+// create-batch.dto.ts
+import { IsString, Matches } from 'class-validator';
 
 export class CreateBatchDto {
   @IsString()
   batch_name: string;
 
-  @IsDateString()
-  @IsOptional()
+  @IsString()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
+    message:
+      'start_date must be in Ethiopian format: YYYY-MM-DD (e.g., 2018-02-23)',
+  })
   start_date: string;
 
-  @IsDateString()
-  end_date: string;
+  @IsString()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'end_date must be YYYY-MM-DD' })
+  end_date?: string;
 
-  @IsBoolean()
-  is_completed: boolean;
+  is_completed?: boolean;
 }

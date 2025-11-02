@@ -9,7 +9,6 @@ import {
   ParseIntPipe,
   UsePipes,
   ValidationPipe,
-  UseInterceptors,
   UseGuards,
 } from '@nestjs/common';
 import { BatchesService } from './batches.service.js';

@@ -18,6 +18,7 @@ type TStudent = {
   is_certified: boolean;
   current_batch_id: number;
   phone_number: string;
+  department: string;
 };
 
 @Injectable()
@@ -47,6 +48,7 @@ export class StudentsService {
         is_certified: false,
         current_batch_id: student.universityusers.batch,
         phone_number: student.phone,
+        department: student.universityusers.departmentname,
       }));
 
       const createdStudents = [];
@@ -77,6 +79,7 @@ export class StudentsService {
       student_id,
       phone_number,
       enrollment_date,
+      department,
     } = student;
 
     if (!student_id || !first_name || !current_batch_id) {
@@ -105,6 +108,7 @@ export class StudentsService {
           enrollment_date,
           phone_number,
           has_consented,
+          department,
         },
       });
 
