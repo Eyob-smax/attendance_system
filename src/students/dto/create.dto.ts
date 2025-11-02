@@ -20,6 +20,5 @@ export class CreateStudentDTO {
   @IsNumber()
   current_batch_id: number;
   @IsString()
-  @IsString()
   phone_number: string;
 }

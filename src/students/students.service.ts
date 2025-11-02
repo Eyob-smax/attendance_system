@@ -7,13 +7,18 @@ import { DatabaseService } from '../database/database.service.js';
 import { ConfigService } from '@nestjs/config';
 import { User } from 'src/common/utils/types.js';
 import { mapPrismaErrorToHttp } from '../common/utils/handleDbError.js';
+import {
+  ethiopianToUTC,
+  utcToEthiopianFormatted,
+  nowInEthiopianNumerical,
+} from '../common/utils/date.utils.js';
 
 type TStudent = {
   student_id: string;
   first_name: string;
   last_name: string;
   email: string;
-  enrollment_date: Date;
+  enrollment_date: Date | string;
   has_consented: boolean;
   is_certified: boolean;
   current_batch_id: number;
@@ -43,7 +48,7 @@ export class StudentsService {
         first_name: student.firstname,
         last_name: student.lastname,
         email: student.useremail,
-        enrollment_date: new Date(),
+        enrollment_date: nowInEthiopianNumerical(),
         has_consented: false,
         is_certified: false,
         current_batch_id: student.universityusers.batch,
@@ -60,7 +65,9 @@ export class StudentsService {
 
       return {
         message: 'Students added successfully',
-        createdStudents,
+        createdStudents: createdStudents.map((s) =>
+          this.formatStudentForEthiopian(s),
+        ),
       };
     } catch (err) {
       console.error('Error fetching students:', err);
@@ -105,13 +112,16 @@ export class StudentsService {
           last_name,
           is_certified,
           current_batch_id,
-          enrollment_date,
+          enrollment_date: ethiopianToUTC(enrollment_date as string),
           phone_number,
           department,
         },
       });
 
-      return { createdStudent, message: 'Created student' };
+      return {
+        createdStudent: this.formatStudentForEthiopian(createdStudent),
+        message: 'Created student',
+      };
     } catch (err) {
       throw mapPrismaErrorToHttp(err);
     }
@@ -119,7 +129,7 @@ export class StudentsService {
 
   async getAllStudents() {
     try {
-      return await this.databaseService.student.findMany({
+      const students = await this.databaseService.student.findMany({
         orderBy: { enrollment_date: 'desc' },
         include: {
           attendances: {
@@ -136,6 +146,7 @@ export class StudentsService {
           current_batch: true,
         },
       });
+      return students.map((s) => this.formatStudentForEthiopian(s));
     } catch (err) {
       console.error('Error fetching students:', err);
       throw mapPrismaErrorToHttp(err);
@@ -153,7 +164,7 @@ export class StudentsService {
       });
 
       if (!student) throw new NotFoundException('Student not found');
-      return student;
+      return this.formatStudentForEthiopian(student);
     } catch (err) {
       console.error('Error fetching student:', err);
       throw mapPrismaErrorToHttp(err);
@@ -167,12 +178,22 @@ export class StudentsService {
       });
       if (!existing) throw new NotFoundException('Student not found');
 
+      const data = { ...updates };
+      if (updates.enrollment_date) {
+        data.enrollment_date = ethiopianToUTC(
+          updates.enrollment_date as string,
+        );
+      }
+
       const updatedStudent = await this.databaseService.student.update({
         where: { student_id },
-        data: updates,
+        data,
       });
 
-      return { updatedStudent, message: 'Student updated successfully' };
+      return {
+        updatedStudent: this.formatStudentForEthiopian(updatedStudent),
+        message: 'Student updated successfully',
+      };
     } catch (err) {
       console.error('Error updating student:', err);
       throw mapPrismaErrorToHttp(err);
@@ -195,5 +216,46 @@ export class StudentsService {
       console.error('Error deleting student:', err);
       throw mapPrismaErrorToHttp(err);
     }
+  }
+
+  private formatStudentForEthiopian(student: any) {
+    const formatted = {
+      ...student,
+      enrollment_date: utcToEthiopianFormatted(student.enrollment_date),
+    };
+
+    if (student.attendances) {
+      formatted.attendances = student.attendances.map((a: any) => ({
+        ...a,
+        recorded_at: utcToEthiopianFormatted(a.recorded_at),
+        course_date: {
+          ...a.course_date,
+          class_date: utcToEthiopianFormatted(a.course_date.class_date),
+          batch: a.course_date.batch
+            ? {
+                ...a.course_date.batch,
+                start_date: utcToEthiopianFormatted(
+                  a.course_date.batch.start_date,
+                ),
+                end_date: a.course_date.batch.end_date
+                  ? utcToEthiopianFormatted(a.course_date.batch.end_date)
+                  : null,
+              }
+            : null,
+        },
+      }));
+    }
+
+    if (student.current_batch) {
+      formatted.current_batch = {
+        ...student.current_batch,
+        start_date: utcToEthiopianFormatted(student.current_batch.start_date),
+        end_date: student.current_batch.end_date
+          ? utcToEthiopianFormatted(student.current_batch.end_date)
+          : null,
+      };
+    }
+
+    return formatted;
   }
 }
