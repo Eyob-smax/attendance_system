@@ -19,7 +19,6 @@ import { DateTime } from 'luxon';
 export class CourseDateService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  // CREATE
   async create(createCourseDateDto: CreateCourseDateDto) {
     const { class_date, start_time, course_id, batch_id } = createCourseDateDto;
 
@@ -59,7 +58,6 @@ export class CourseDateService {
     }
   }
 
-  // READ ALL
   async findAll() {
     try {
       const courseDates = await this.databaseService.courseDate.findMany({
@@ -77,7 +75,6 @@ export class CourseDateService {
     }
   }
 
-  // READ ONE
   async findOne(id: number) {
     try {
       const courseDate = await this.databaseService.courseDate.findUnique({
@@ -97,7 +94,6 @@ export class CourseDateService {
     }
   }
 
-  // UPDATE
   async update(id: number, updateCourseDateDto: UpdateCourseDateDto) {
     try {
       const data: Prisma.CourseDateUpdateInput = { ...updateCourseDateDto };
@@ -138,7 +134,6 @@ export class CourseDateService {
     }
   }
 
-  // DELETE
   async remove(id: number) {
     try {
       const courseDate = await this.databaseService.courseDate.delete({
@@ -157,7 +152,6 @@ export class CourseDateService {
     }
   }
 
-  // FORMAT: UTC → Ethiopian Calendar + EAT time
   private formatCourseDateForEthiopian(courseDate: any) {
     return {
       ...courseDate,
@@ -166,7 +160,6 @@ export class CourseDateService {
       course: courseDate.course
         ? {
             ...courseDate.course,
-            // Add course formatting if needed
           }
         : null,
       batch: courseDate.batch
