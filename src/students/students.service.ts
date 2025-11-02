@@ -107,7 +107,6 @@ export class StudentsService {
           current_batch_id,
           enrollment_date,
           phone_number,
-          has_consented,
           department,
         },
       });
