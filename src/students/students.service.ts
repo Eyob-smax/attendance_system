@@ -19,7 +19,6 @@ type TStudent = {
   last_name: string;
   email: string;
   enrollment_date: Date | string;
-  has_consented: boolean;
   is_certified: boolean;
   current_batch_id: number;
   phone_number: string;
@@ -80,7 +79,6 @@ export class StudentsService {
       current_batch_id,
       email,
       first_name,
-      has_consented,
       is_certified,
       last_name,
       student_id,

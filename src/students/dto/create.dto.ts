@@ -1,4 +1,10 @@
-import { IsBoolean, IsDateString, IsNumber, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsDateString,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateStudentDTO {
   @IsString()
@@ -12,10 +18,9 @@ export class CreateStudentDTO {
   @IsString()
   email: string;
   @IsDateString()
-  enrollment_date: Date;
+  enrollment_date: string;
   @IsBoolean()
-  has_consented: boolean;
-  @IsBoolean()
+  @IsOptional()
   is_certified: boolean;
   @IsNumber()
   current_batch_id: number;
