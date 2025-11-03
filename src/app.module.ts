@@ -14,6 +14,7 @@ import { TasksModule } from './tasks/tasks.module.js';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { CommonInterceptor } from './common/interceptors/cache.interceptor.js';
 import { GeneralInterceptor } from './common/interceptors/common.interceptor.js';
+import { AnalyticsModule } from './analytics/analytics.module';
 @Module({
   imports: [
     DatabaseModule,
@@ -32,17 +33,14 @@ import { GeneralInterceptor } from './common/interceptors/common.interceptor.js'
     ScheduleModule.forRoot(),
     TasksModule,
     RedisModule,
+    AnalyticsModule,
   ],
   controllers: [],
   providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: GeneralInterceptor,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: CommonInterceptor,
-    },
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: GeneralInterceptor,
+    // },
   ],
 })
 export class AppModule {}

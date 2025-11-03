@@ -15,6 +15,7 @@ import {
   ACCESS_TOKEN_EX_STR,
   REFRESH_TOKEN_EX_NUM,
 } from '../common/constants/constants.js';
+import { hashPassword } from '../common/utils/authUtil.js';
 
 @Injectable()
 export class AuthService {

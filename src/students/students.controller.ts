@@ -6,13 +6,17 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { StudentsService } from './students.service.js';
 import { CreateStudentDTO } from './dto/create.dto.js';
 import { UpdateStudentDto } from './dto/update.dto.js';
+import { AuthGuard } from '../common/guard/auth.guard.js';
+import { RoleGuard } from '../common/guard/role.guard.js';
 @Controller('student')
+@UseGuards(AuthGuard, RoleGuard)
 export class StudentsController {
   constructor(private readonly getStudentsService: StudentsService) {}
 
