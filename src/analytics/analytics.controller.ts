@@ -1,7 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
-import { CreateAnalyticsDto } from './dto/create-analytics.dto';
-import { UpdateAnalyticsDto } from './dto/update-analytics.dto';
+import { CreateAnalyticsDto } from './dto/create-analytics.dto.js';
+import { UpdateAnalyticsDto } from './dto/update-analytics.dto.js';
 
 @Controller('analytics')
 export class AnalyticsController {
@@ -23,7 +31,10 @@ export class AnalyticsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAnalyticsDto: UpdateAnalyticsDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateAnalyticsDto: UpdateAnalyticsDto,
+  ) {
     return this.analyticsService.update(+id, updateAnalyticsDto);
   }
 

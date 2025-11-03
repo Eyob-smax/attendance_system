@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAnalyticsDto } from './dto/create-analytics.dto';
-import { UpdateAnalyticsDto } from './dto/update-analytics.dto';
+import { CreateAnalyticsDto } from './dto/create-analytics.dto.js';
+import { UpdateAnalyticsDto } from './dto/update-analytics.dto.js';
 
 @Injectable()
 export class AnalyticsService {
