@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { AnalyticsService } from './analytics.service';
+import { AnalyticsService } from './analytics.service.js';
 import { CreateAnalyticsDto } from './dto/create-analytics.dto.js';
 import { UpdateAnalyticsDto } from './dto/update-analytics.dto.js';
 
