@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
+import { AnalyticsResolver } from './analytics.resolver.js';
 import { AnalyticsService } from './analytics.service.js';
-import { AnalyticsController } from './analytics.controller.js';
 
 @Module({
-  controllers: [AnalyticsController],
-  providers: [AnalyticsService],
+  providers: [AnalyticsResolver, AnalyticsService],
 })
 export class AnalyticsModule {}

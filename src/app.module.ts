@@ -11,9 +11,13 @@ import { UsersModule } from './users/users.module.js';
 import { StudentsModule } from './students/students.module.js';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './tasks/tasks.module.js';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+
 // import { APP_INTERCEPTOR } from '@nestjs/core';
 // import { CommonInterceptor } from './common/interceptors/cache.interceptor.js';
 // import { GeneralInterceptor } from './common/interceptors/common.interceptor.js';
+import { join } from 'path';
 import { AnalyticsModule } from './analytics/analytics.module.js';
 @Module({
   imports: [
@@ -33,6 +37,11 @@ import { AnalyticsModule } from './analytics/analytics.module.js';
     ScheduleModule.forRoot(),
     TasksModule,
     RedisModule,
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/graphql/schema.gql'),
+      graphiql: true,
+    }),
     AnalyticsModule,
   ],
   controllers: [],
