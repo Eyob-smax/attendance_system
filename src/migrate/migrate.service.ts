@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { mapPrismaErrorToHttp } from '../common/utils/handleDbError.js';
 import { DatabaseService } from '../database/database.service.js';
 
@@ -63,6 +67,95 @@ export class MigrateService {
       };
     } catch (err) {
       throw mapPrismaErrorToHttp(err);
+    }
+  }
+
+  async getStudentBatchEntries() {
+    try {
+      return await this.databaseService.studentBatch.findMany({
+        include: {
+          student: true,
+          batch: true,
+        },
+        orderBy: { id: 'desc' },
+      });
+    } catch (error) {
+      throw mapPrismaErrorToHttp(error);
+    }
+  }
+
+  async getStudentBatchById(id: number) {
+    try {
+      const entry = await this.databaseService.studentBatch.findUnique({
+        where: { id },
+        include: {
+          student: true,
+          batch: true,
+        },
+      });
+
+      if (!entry) {
+        throw new NotFoundException(`StudentBatch with ID ${id} not found`);
+      }
+
+      return entry;
+    } catch (error) {
+      throw mapPrismaErrorToHttp(error);
+    }
+  }
+
+  async createStudentBatch(data: {
+    student_id: string;
+    batch_id: number;
+    is_active?: boolean;
+    join_date?: Date;
+    leave_date?: Date | null;
+  }) {
+    try {
+      return await this.databaseService.studentBatch.create({
+        data,
+      });
+    } catch (error) {
+      throw mapPrismaErrorToHttp(error);
+    }
+  }
+
+  async updateStudentBatch(id: number, data: any) {
+    try {
+      const existing = await this.databaseService.studentBatch.findUnique({
+        where: { id },
+      });
+
+      if (!existing) {
+        throw new NotFoundException(`StudentBatch with ID ${id} not found`);
+      }
+
+      return await this.databaseService.studentBatch.update({
+        where: { id },
+        data,
+      });
+    } catch (error) {
+      throw mapPrismaErrorToHttp(error);
+    }
+  }
+
+  async deleteStudentBatch(id: number) {
+    try {
+      const existing = await this.databaseService.studentBatch.findUnique({
+        where: { id },
+      });
+
+      if (!existing) {
+        throw new NotFoundException(`StudentBatch with ID ${id} not found`);
+      }
+
+      await this.databaseService.studentBatch.delete({
+        where: { id },
+      });
+
+      return { message: `StudentBatch with ID ${id} deleted successfully` };
+    } catch (error) {
+      throw mapPrismaErrorToHttp(error);
     }
   }
 }

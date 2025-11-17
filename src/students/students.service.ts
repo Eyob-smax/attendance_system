@@ -12,6 +12,7 @@ import {
   utcToEthiopianFormatted,
   nowInEthiopianNumerical,
 } from '../common/utils/date.utils.js';
+import { MigrateService } from '../migrate/migrate.service.js';
 
 type TStudent = {
   student_id: string;
@@ -32,6 +33,7 @@ export class StudentsService {
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly config: ConfigService,
+    private readonly migration: MigrateService,
   ) {
     this.studentApi = this.config.get<string>('STUDENTS_API');
   }
@@ -48,7 +50,6 @@ export class StudentsService {
         last_name: student.lastname,
         email: student.useremail,
         enrollment_date: nowInEthiopianNumerical(),
-        has_consented: false,
         is_certified: false,
         current_batch_id: student.universityusers.batch,
         phone_number: student.phone,
@@ -57,16 +58,14 @@ export class StudentsService {
 
       const createdStudents = [];
 
-      for await (const element of mappedData) {
+      for (const element of mappedData) {
         const result = await this.addStudent(element);
         if (result) createdStudents.push(result.createdStudent);
       }
 
       return {
         message: 'Students added successfully',
-        createdStudents: createdStudents.map((s) =>
-          this.formatStudentForEthiopian(s),
-        ),
+        createdStudents,
       };
     } catch (err) {
       console.error('Error fetching students:', err);
@@ -92,39 +91,51 @@ export class StudentsService {
     }
 
     try {
-      const existingStudent = await this.databaseService.student.findUnique({
+      const existing = await this.databaseService.student.findUnique({
         where: { student_id },
       });
 
-      if (existingStudent) {
+      if (existing) {
         throw new BadRequestException(
-          `Student with ${student_id} already created!`,
+          `Student with ID ${student_id} already exists!`,
         );
       }
 
-      const createdStudent = await this.databaseService.student.create({
-        data: {
-          student_id,
-          email,
-          first_name,
-          last_name,
-          is_certified,
-          current_batch_id,
-          enrollment_date: ethiopianToUTC(enrollment_date as string),
-          phone_number,
-          department,
-        },
+      let createdStudent: TStudent;
+
+      await this.databaseService.$transaction(async (tx) => {
+        createdStudent = await tx.student.create({
+          data: {
+            student_id,
+            email,
+            first_name,
+            last_name,
+            is_certified,
+            current_batch_id,
+            enrollment_date: ethiopianToUTC(enrollment_date as string),
+            phone_number,
+            department,
+          },
+        });
+
+        await tx.studentBatch.create({
+          data: {
+            student_id,
+            batch_id: current_batch_id,
+            is_active: true,
+          },
+        });
       });
 
       return {
         createdStudent: this.formatStudentForEthiopian(createdStudent),
-        message: 'Created student',
+        message: 'Created student successfully',
       };
     } catch (err) {
+      console.error('Error creating student:', err);
       throw mapPrismaErrorToHttp(err);
     }
   }
-
   async getAllStudents() {
     try {
       const students = await this.databaseService.student.findMany({
@@ -144,6 +155,7 @@ export class StudentsService {
           current_batch: true,
         },
       });
+
       return students.map((s) => this.formatStudentForEthiopian(s));
     } catch (err) {
       console.error('Error fetching students:', err);
@@ -164,7 +176,6 @@ export class StudentsService {
       if (!student) throw new NotFoundException('Student not found');
       return this.formatStudentForEthiopian(student);
     } catch (err) {
-      console.error('Error fetching student:', err);
       throw mapPrismaErrorToHttp(err);
     }
   }
@@ -193,7 +204,6 @@ export class StudentsService {
         message: 'Student updated successfully',
       };
     } catch (err) {
-      console.error('Error updating student:', err);
       throw mapPrismaErrorToHttp(err);
     }
   }
@@ -211,7 +221,6 @@ export class StudentsService {
 
       return { message: 'Student deleted successfully' };
     } catch (err) {
-      console.error('Error deleting student:', err);
       throw mapPrismaErrorToHttp(err);
     }
   }

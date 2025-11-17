@@ -5,5 +5,6 @@ import { MigrateController } from './migrate.controller.js';
 @Module({
   controllers: [MigrateController],
   providers: [MigrateService],
+  exports: [MigrateService],
 })
 export class MigrateModule {}
