@@ -19,6 +19,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 // import { GeneralInterceptor } from './common/interceptors/common.interceptor.js';
 import { join } from 'path';
 import { AnalyticsModule } from './analytics/analytics.module.js';
+import { MigrateModule } from './migrate/migrate.module.js';
 @Module({
   imports: [
     DatabaseModule,
@@ -43,6 +44,7 @@ import { AnalyticsModule } from './analytics/analytics.module.js';
       graphiql: true,
     }),
     AnalyticsModule,
+    MigrateModule,
   ],
   controllers: [],
   providers: [
