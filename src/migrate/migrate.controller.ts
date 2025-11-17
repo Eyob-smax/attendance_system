@@ -11,6 +11,7 @@ import { MigrateService } from './migrate.service.js';
 import { CreateMigrationDTO } from './DTO/create-igration.dto.js';
 import { CreateStudentBatchDto } from './DTO/create-student-batch.dto.js';
 import { UpdateStudentBatchDto } from './DTO/update-student-batch.dto.js';
+import { Cacheable } from '../common/decorators/cache.decorator.js';
 
 @Controller('migrate')
 export class MigrateController {
@@ -24,6 +25,7 @@ export class MigrateController {
     );
   }
 
+  @Cacheable()
   @Get()
   async getStudentBatch() {
     return await this.migrateService.getStudentBatchEntries();

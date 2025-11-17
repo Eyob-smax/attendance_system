@@ -1,44 +1,62 @@
 import {
   CallHandler,
   ExecutionContext,
-  Inject,
+  Injectable,
   NestInterceptor,
+  Inject,
+  BadRequestException,
 } from '@nestjs/common';
-import { Request } from 'express';
+import { tap } from 'rxjs/operators';
 import type { RedisClientType } from 'redis';
-import { Observable } from 'rxjs';
-import { REDIS_EX_NUM } from '../constants/constants.js';
+import { CACHE_KEY } from '../decorators/cache.decorator.js';
+import { Reflector } from '@nestjs/core';
+import chalk from 'chalk/index.js';
+import { of } from 'rxjs';
 
-export class CommonInterceptor implements NestInterceptor {
+@Injectable()
+export class SmartCacheInterceptor implements NestInterceptor {
   constructor(
-    @Inject('REDIS_CLIENT') private readonly redis: RedisClientType,
+    private reflector: Reflector,
+    @Inject('REDIS_CLIENT') private redis: RedisClientType,
   ) {}
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler<any>,
-  ): Observable<any> | Promise<Observable<any>> {
-    const request = context.switchToHttp().getRequest<Request>();
-    const key = `${request.method}:${request.url}`;
 
-    return new Observable((subscriber) => {
-      this.redis.get(key).then((cachedData) => {
-        if (cachedData && request.method === 'GET') {
-          subscriber.next({
-            cached: true,
-            data: JSON.parse(cachedData as string),
-          });
-          subscriber.complete();
-        } else {
-          next.handle().subscribe({
-            next: async (data) => {
-              subscriber.next({ cached: false, data });
-              subscriber.complete();
-              await this.redis.setEx(key, REDIS_EX_NUM, JSON.stringify(data));
-            },
-            error: (err) => subscriber.error(err),
-          });
-        }
+  async intercept(context: ExecutionContext, next: CallHandler): Promise<any> {
+    const useCache = this.reflector.get<boolean>(
+      CACHE_KEY,
+      context.getHandler(),
+    );
+    if (!useCache) return next.handle();
+
+    const request = context.switchToHttp().getRequest();
+    const cacheKey = this.buildKey(request);
+
+    const cached = await this.redis.get(cacheKey);
+    if (cached) {
+      if (typeof cached !== 'string') {
+        throw new BadRequestException('The cached data is not a string');
+      }
+      const parsed = JSON.parse(cached);
+
+      next.handle().subscribe(async (fresh) => {
+        await this.redis.setEx(cacheKey, 60, JSON.stringify(fresh));
       });
-    });
+
+      return of({
+        cached: true,
+        data: parsed,
+      });
+    }
+
+    return next.handle().pipe(
+      tap(async (fresh) => {
+        await this.redis.setEx(cacheKey, 60, JSON.stringify(fresh));
+      }),
+    );
+  }
+
+  private buildKey(req: any) {
+    return `cache:${req.method}:${req.route?.path}:${JSON.stringify(
+      req.query,
+    )}`;
   }
 }

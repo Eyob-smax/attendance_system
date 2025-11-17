@@ -16,6 +16,7 @@ import { UpdateAttendanceDto } from './dto/update-attendance.dto.js';
 import { AuthGuard } from '../common/guard/auth.guard.js';
 import { RoleGuard } from '../common/guard/role.guard.js';
 import { Role } from '../common/decorators/role.decorator.js';
+import { Cacheable } from '../common/decorators/cache.decorator.js';
 
 @Controller('attendance')
 @UseGuards(AuthGuard, RoleGuard)
@@ -30,7 +31,7 @@ export class AttendanceController {
   ) {
     return this.attendanceService.create(createAttendanceDto);
   }
-
+  @Cacheable()
   @Get()
   findAll() {
     return this.attendanceService.findAll();

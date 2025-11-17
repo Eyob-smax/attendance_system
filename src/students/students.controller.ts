@@ -15,11 +15,12 @@ import { CreateStudentDTO } from './dto/create.dto.js';
 import { UpdateStudentDto } from './dto/update.dto.js';
 import { AuthGuard } from '../common/guard/auth.guard.js';
 import { RoleGuard } from '../common/guard/role.guard.js';
+import { Cacheable } from '../common/decorators/cache.decorator.js';
 @Controller('student')
 @UseGuards(AuthGuard, RoleGuard)
 export class StudentsController {
   constructor(private readonly getStudentsService: StudentsService) {}
-
+  @Cacheable()
   @Get()
   async getAll() {
     return await this.getStudentsService.getAllStudents();
