@@ -18,7 +18,6 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 // import { CommonInterceptor } from './common/interceptors/cache.interceptor.js';
 // import { GeneralInterceptor } from './common/interceptors/common.interceptor.js';
 import { join } from 'path';
-import { AnalyticsModule } from './analytics/analytics.module.js';
 import { MigrateModule } from './migrate/migrate.module.js';
 @Module({
   imports: [
@@ -43,7 +42,6 @@ import { MigrateModule } from './migrate/migrate.module.js';
       autoSchemaFile: join(process.cwd(), 'src/graphql/schema.gql'),
       graphiql: true,
     }),
-    AnalyticsModule,
     MigrateModule,
   ],
   controllers: [],
