@@ -37,11 +37,6 @@ import { MigrateModule } from './migrate/migrate.module.js';
     ScheduleModule.forRoot(),
     TasksModule,
     RedisModule,
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/graphql/schema.gql'),
-      graphiql: true,
-    }),
     MigrateModule,
   ],
   controllers: [],
