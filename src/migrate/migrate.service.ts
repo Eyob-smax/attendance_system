@@ -58,7 +58,6 @@ export class MigrateService {
       });
 
       return {
-        success: true,
         migrated: activeStudents.length,
         message: `Successfully migrated ${activeStudents.length} students from batch ${fromBatchId} to ${toBatchId}.`,
       };
