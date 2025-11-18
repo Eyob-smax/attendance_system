@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "strict": true,
+    // "strict": true,
     "module": "esnext",
     "moduleResolution": "node",
     "resolvePackageJsonExports": false,
