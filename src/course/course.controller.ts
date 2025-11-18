@@ -16,6 +16,7 @@ import { UpdateCourseDto } from './dto/update-course.dto.js';
 import { AuthGuard } from '../common/guard/auth.guard.js';
 import { RoleGuard } from '../common/guard/role.guard.js';
 import { Role } from '../common/decorators/role.decorator.js';
+import { Cacheable } from '../common/decorators/cache.decorator.js';
 
 @Controller('course')
 @UseGuards(AuthGuard, RoleGuard)
@@ -29,6 +30,7 @@ export class CourseController {
   }
 
   @Get()
+  @Cacheable()
   async findAll() {
     return await this.courseService.findAll();
   }

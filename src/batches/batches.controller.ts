@@ -17,6 +17,7 @@ import { UpdateBatchDto } from './dto/update-batch.dto.js';
 import { Role } from '../common/decorators/role.decorator.js';
 import { AuthGuard } from '../common/guard/auth.guard.js';
 import { RoleGuard } from '../common/guard/role.guard.js';
+import { Cacheable } from '../common/decorators/cache.decorator.js';
 
 @Controller('batches')
 @UseGuards(AuthGuard, RoleGuard)
@@ -35,6 +36,7 @@ export class BatchesController {
     return await this.batchesService.create(createBatchDto);
   }
 
+  @Cacheable()
   @Get()
   async findAll() {
     return await this.batchesService.findAll();

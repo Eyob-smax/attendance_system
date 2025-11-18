@@ -10,8 +10,8 @@ import { tap } from 'rxjs/operators';
 import type { RedisClientType } from 'redis';
 import { CACHE_KEY } from '../decorators/cache.decorator.js';
 import { Reflector } from '@nestjs/core';
-import chalk from 'chalk/index.js';
 import { of } from 'rxjs';
+import { REDIS_EX_NUM } from '../constants/constants.js';
 
 @Injectable()
 export class SmartCacheInterceptor implements NestInterceptor {
@@ -38,7 +38,7 @@ export class SmartCacheInterceptor implements NestInterceptor {
       const parsed = JSON.parse(cached);
 
       next.handle().subscribe(async (fresh) => {
-        await this.redis.setEx(cacheKey, 60, JSON.stringify(fresh));
+        await this.redis.setEx(cacheKey, REDIS_EX_NUM, JSON.stringify(fresh));
       });
 
       return of({
@@ -49,7 +49,7 @@ export class SmartCacheInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       tap(async (fresh) => {
-        await this.redis.setEx(cacheKey, 60, JSON.stringify(fresh));
+        await this.redis.setEx(cacheKey, REDIS_EX_NUM, JSON.stringify(fresh));
       }),
     );
   }
