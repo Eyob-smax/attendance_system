@@ -11,7 +11,7 @@ import {
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../../prisma/generated/client/client.js';
 
 export function mapPrismaErrorToHttp(error: unknown): Error {
   // Check if the error is already a known NestJS HTTP exception

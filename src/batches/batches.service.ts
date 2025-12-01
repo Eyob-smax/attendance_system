@@ -12,7 +12,7 @@ import {
   utcToEthiopianFormatted,
   formatTimeInET,
 } from '../common/utils/date.utils.js';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../prisma/generated/client/client.js';
 
 @Injectable()
 export class BatchesService {

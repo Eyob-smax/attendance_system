@@ -1,7 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { ConfigService } from '@nestjs/config';
+import { PrismaClient } from '../../prisma/generated/client/client.js';
 @Injectable()
 export class DatabaseService extends PrismaClient implements OnModuleInit {
   constructor(private readonly config: ConfigService) {
