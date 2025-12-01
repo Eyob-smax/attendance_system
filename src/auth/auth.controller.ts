@@ -8,7 +8,6 @@ import {
   ValidationPipe,
   UnauthorizedException,
   Req,
-  HttpStatus,
   HttpCode,
 } from '@nestjs/common';
 import { AuthService } from './auth.service.js';

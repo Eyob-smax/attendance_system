@@ -50,7 +50,6 @@ export class RoleGuard implements CanActivate {
         'Invalid or expired authentication token.',
       );
     }
-
     const userRole = decoded.role;
     if (!userRole) {
       throw new UnauthorizedException('Token missing role information.');
