@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAttendanceDto } from './dto/create-attendance.dto.js';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto.js';
 import { DatabaseService } from '../database/database.service.js';
@@ -75,7 +79,10 @@ export class AttendanceService {
       });
 
       if (!attendance) {
-        throw mapPrismaErrorToHttp({ code: 'P2025' });
+        console.log('Attendance record not found for ID:', id);
+        throw new NotFoundException(
+          'Attendance record not found with the given ID.',
+        );
       }
 
       return {
@@ -83,6 +90,7 @@ export class AttendanceService {
         message: `Attendance record #${id} retrieved successfully!`,
       };
     } catch (err) {
+      console.log(err);
       throw mapPrismaErrorToHttp(err);
     }
   }

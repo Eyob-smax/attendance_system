@@ -14,6 +14,7 @@ import { mapPrismaErrorToHttp } from '../common/utils/handleDbError.js';
 import {
   ACCESS_TOKEN_EX_STR,
   REFRESH_TOKEN_EX_NUM,
+  REFRESH_TOKEN_EX_STR,
 } from '../common/constants/constants.js';
 
 @Injectable()
@@ -61,7 +62,7 @@ export class AuthService {
       });
 
       const refreshToken = jwt.sign(payload, refreshSecret, {
-        expiresIn: ACCESS_TOKEN_EX_STR,
+        expiresIn: REFRESH_TOKEN_EX_STR,
       });
 
       const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);

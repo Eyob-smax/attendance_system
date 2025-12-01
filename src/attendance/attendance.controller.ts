@@ -25,34 +25,34 @@ export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}
 
   @Post()
-  create(
+  async create(
     @Body(new ValidationPipe({ forbidNonWhitelisted: true, whitelist: true }))
     createAttendanceDto: CreateAttendanceDto,
   ) {
-    return this.attendanceService.create(createAttendanceDto);
+    return await this.attendanceService.create(createAttendanceDto);
   }
   @Cacheable()
   @Get()
-  findAll() {
-    return this.attendanceService.findAll();
+  async findAll() {
+    return await this.attendanceService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.attendanceService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.attendanceService.findOne(id);
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ValidationPipe({ forbidNonWhitelisted: true, whitelist: true }))
     updateAttendanceDto: UpdateAttendanceDto,
   ) {
-    return this.attendanceService.update(id, updateAttendanceDto);
+    return await this.attendanceService.update(id, updateAttendanceDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.attendanceService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return await this.attendanceService.remove(id);
   }
 }
