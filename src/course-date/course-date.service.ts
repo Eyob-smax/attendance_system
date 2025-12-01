@@ -12,8 +12,8 @@ import {
   utcToEthiopianFormatted,
   formatTimeInET,
 } from '../common/utils/date.utils.js';
-import { Prisma } from '@prisma/client';
 import { DateTime } from 'luxon';
+import { Prisma } from '../../prisma/generated/client/client.js';
 
 @Injectable()
 export class CourseDateService {
