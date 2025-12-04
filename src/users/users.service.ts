@@ -16,9 +16,9 @@ export class UsersService {
   constructor(private readonly databaseService: DatabaseService) {}
 
   async create(createUserDto: CreateUserDto) {
-    const { username, student_id, password_hash, role, email } = createUserDto;
+    const { username, student_id, password, role, email } = createUserDto;
 
-    if (!username || !student_id || !password_hash || !role || !email) {
+    if (!username || !student_id || !password || !role || !email) {
       throw new BadRequestException('Missing required fields');
     }
 
@@ -35,7 +35,7 @@ export class UsersService {
         );
       }
 
-      const hashedPassword = await bcrypt.hash(password_hash, 10);
+      const hashedPassword = await bcrypt.hash(password, 10);
 
       const newUser = await this.databaseService.user.create({
         data: {
@@ -98,11 +98,8 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     try {
-      if (updateUserDto.password_hash) {
-        updateUserDto.password_hash = await bcrypt.hash(
-          updateUserDto.password_hash,
-          10,
-        );
+      if (updateUserDto.password) {
+        updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
       }
 
       const updatedUser = await this.databaseService.user.update({
