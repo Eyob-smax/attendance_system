@@ -6,7 +6,7 @@ export class CreateUserDto {
   @IsString()
   student_id: string;
   @IsString()
-  password_hash: string;
+  password: string;
   @IsString()
   role: string;
   @IsEmail()
